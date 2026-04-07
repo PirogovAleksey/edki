@@ -216,8 +216,8 @@ export async function startTest(topicId: string, mode: 'training' | 'exam'): Pro
 
   const data: QuestionSet = await loadQuestions(topicId);
 
-  const isComprehensive = topicId === 'comprehensive';
-  const limit = isComprehensive ? 100 : 10;
+  const isFullExam = topicId === 'comprehensive' || topicId.startsWith('real-exam');
+  const limit = isFullExam ? 100 : 10;
   const selected = shuffle(data.questions).slice(0, limit);
 
   state = {
