@@ -202,13 +202,26 @@ function finishTest(): void {
   cleanup();
 }
 
+function shuffle<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 export async function startTest(topicId: string, mode: 'training' | 'exam'): Promise<void> {
   cleanup();
 
   const data: QuestionSet = await loadQuestions(topicId);
 
+  const isComprehensive = topicId === 'comprehensive';
+  const limit = isComprehensive ? 100 : 10;
+  const selected = shuffle(data.questions).slice(0, limit);
+
   state = {
-    questions: data.questions,
+    questions: selected,
     topicName: data.topic,
     mode,
     currentIndex: 0,
