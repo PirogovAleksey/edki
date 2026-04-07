@@ -21,6 +21,18 @@ a:hover {
   color: var(--accent-hover);
 }
 
+a.btn {
+  color: inherit;
+}
+
+a.btn--primary {
+  color: #fff;
+}
+
+a.btn--primary:hover {
+  color: #fff;
+}
+
 .container {
   max-width: 900px;
   margin: 0 auto;
