@@ -12,6 +12,11 @@ export const topics: TopicMeta[] = [
     description: 'Моделі OSI/TCP-IP, адресація, мережеві атаки, фаєрволи, IDS/IPS, VPN.',
   },
   {
+    id: 'programming',
+    title: 'Алгоритмізація та програмування',
+    description: 'Основи програмування, ООП, алгоритми сортування та пошуку.',
+  },
+  {
     id: 'security-technologies',
     title: 'Технології захисту інформації',
     description: 'Класифікація загроз, засоби захисту, управління доступом, SIEM, захист ОС.',
@@ -35,6 +40,11 @@ export const topics: TopicMeta[] = [
     id: 'incident-management',
     title: 'Управління інцидентами кібербезпеки',
     description: 'Реагування на інциденти, цифрова криміналістика, CERT-UA, відновлення.',
+  },
+  {
+    id: 'technical-protection',
+    title: 'Технічний захист інформації',
+    description: 'Канали витоку, закладні пристрої, екранування, КСЗІ, фізична безпека.',
   },
 ];
 
