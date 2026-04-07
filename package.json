@@ -1,0 +1,19 @@
+{
+  "name": "edki",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "private": true,
+  "devDependencies": {
+    "marked": "^18.0.0",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.6",
+    "vite-plugin-markdown": "^2.2.0"
+  }
+}
