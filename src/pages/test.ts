@@ -3,6 +3,20 @@ import { loadQuestions } from '../content';
 import { renderQuestion } from '../components/question';
 import { renderProgressBar } from '../components/progress-bar';
 
+const SAVE_KEY = 'edki-test-progress';
+
+interface SavedProgress {
+  topicId: string;
+  mode: 'training' | 'exam';
+  questions: Question[];
+  topicName: string;
+  answers: (number | null)[];
+  currentIndex: number;
+  timeRemaining: number;
+  timeLimit: number;
+  savedAt: number;
+}
+
 interface TestState {
   questions: Question[];
   topicName: string;
@@ -13,9 +27,48 @@ interface TestState {
   timeLimit: number;
   timeRemaining: number;
   timerId: number | null;
+  topicId: string;
 }
 
 let state: TestState | null = null;
+
+function saveProgress(): void {
+  if (!state) return;
+  const saved: SavedProgress = {
+    topicId: state.topicId,
+    mode: state.mode,
+    questions: state.questions,
+    topicName: state.topicName,
+    answers: state.answers,
+    currentIndex: state.currentIndex,
+    timeRemaining: state.timeRemaining,
+    timeLimit: state.timeLimit,
+    savedAt: Date.now(),
+  };
+  localStorage.setItem(SAVE_KEY, JSON.stringify(saved));
+}
+
+function loadProgress(topicId: string, mode: string): SavedProgress | null {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return null;
+    const saved: SavedProgress = JSON.parse(raw);
+    if (saved.topicId !== topicId || saved.mode !== mode) return null;
+    // Expire after 24 hours
+    if (Date.now() - saved.savedAt > 24 * 60 * 60 * 1000) {
+      localStorage.removeItem(SAVE_KEY);
+      return null;
+    }
+    return saved;
+  } catch {
+    localStorage.removeItem(SAVE_KEY);
+    return null;
+  }
+}
+
+function clearProgress(): void {
+  localStorage.removeItem(SAVE_KEY);
+}
 
 function cleanup(): void {
   if (state?.timerId !== null && state?.timerId !== undefined) {
@@ -31,6 +84,7 @@ function getPageContent(): HTMLElement {
 
 function render(): void {
   if (!state) return;
+  saveProgress();
   const app = getPageContent();
   const q = state.questions[state.currentIndex];
 
@@ -203,6 +257,7 @@ function finishTest(): void {
     </div>
   `;
 
+  clearProgress();
   cleanup();
 }
 
@@ -215,10 +270,47 @@ function shuffle<T>(array: T[]): T[] {
   return shuffled;
 }
 
+function startTimer(): void {
+  if (!state || state.mode !== 'exam') return;
+  state.timerId = window.setInterval(() => {
+    if (!state) return;
+    state.timeRemaining--;
+    saveProgress();
+    if (state.timeRemaining <= 0) {
+      finishTest();
+      return;
+    }
+    const timerEl = document.querySelector('.timer');
+    if (timerEl) {
+      timerEl.outerHTML = renderTimer(state.timeRemaining);
+    }
+  }, 1000);
+}
+
 export async function startTest(topicId: string, mode: 'training' | 'exam'): Promise<void> {
   cleanup();
 
   const validMode = mode === 'exam' ? 'exam' : 'training';
+
+  // Check for saved progress
+  const saved = loadProgress(topicId, validMode);
+  if (saved) {
+    state = {
+      questions: saved.questions,
+      topicName: saved.topicName,
+      mode: saved.mode,
+      currentIndex: saved.currentIndex,
+      answers: saved.answers,
+      showFeedback: false,
+      timeLimit: saved.timeLimit,
+      timeRemaining: saved.timeRemaining,
+      timerId: null,
+      topicId,
+    };
+    startTimer();
+    render();
+    return;
+  }
 
   let data: QuestionSet;
   try {
@@ -243,23 +335,10 @@ export async function startTest(topicId: string, mode: 'training' | 'exam'): Pro
     timeLimit: (data.timeLimit || 60) * 60,
     timeRemaining: (data.timeLimit || 60) * 60,
     timerId: null,
+    topicId,
   };
 
-  if (mode === 'exam') {
-    state.timerId = window.setInterval(() => {
-      if (!state) return;
-      state.timeRemaining--;
-      if (state.timeRemaining <= 0) {
-        finishTest();
-        return;
-      }
-      const timerEl = document.querySelector('.timer');
-      if (timerEl) {
-        timerEl.outerHTML = renderTimer(state.timeRemaining);
-      }
-    }, 1000);
-  }
-
+  startTimer();
   render();
 }
 
