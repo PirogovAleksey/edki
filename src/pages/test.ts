@@ -295,20 +295,50 @@ export async function startTest(topicId: string, mode: 'training' | 'exam'): Pro
   // Check for saved progress
   const saved = loadProgress(topicId, validMode);
   if (saved) {
-    state = {
-      questions: saved.questions,
-      topicName: saved.topicName,
-      mode: saved.mode,
-      currentIndex: saved.currentIndex,
-      answers: saved.answers,
-      showFeedback: false,
-      timeLimit: saved.timeLimit,
-      timeRemaining: saved.timeRemaining,
-      timerId: null,
-      topicId,
-    };
-    startTimer();
-    render();
+    const answered = saved.answers.filter(a => a !== null).length;
+    const app = getPageContent();
+    app.innerHTML = `
+      <div class="page">
+        <div class="container">
+          <h1 class="page__title">${saved.topicName}</h1>
+          <div class="card" style="text-align: center;">
+            <p style="margin-bottom: 1rem; font-size: 1.1rem;">У вас є незавершений тест</p>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+              Відповіді: ${answered} з ${saved.questions.length} |
+              Питання: ${saved.currentIndex + 1}
+              ${saved.mode === 'exam' ? ' | Час: ' + Math.floor(saved.timeRemaining / 60) + ' хв' : ''}
+            </p>
+            <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+              <button class="btn btn--primary" id="resume-btn">Продовжити</button>
+              <button class="btn btn--outline" id="restart-btn">Почати заново</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('resume-btn')?.addEventListener('click', () => {
+      state = {
+        questions: saved.questions,
+        topicName: saved.topicName,
+        mode: saved.mode,
+        currentIndex: saved.currentIndex,
+        answers: saved.answers,
+        showFeedback: false,
+        timeLimit: saved.timeLimit,
+        timeRemaining: saved.timeRemaining,
+        timerId: null,
+        topicId,
+      };
+      startTimer();
+      render();
+    });
+
+    document.getElementById('restart-btn')?.addEventListener('click', () => {
+      clearProgress();
+      startTest(topicId, validMode);
+    });
+
     return;
   }
 
