@@ -17,14 +17,39 @@
 
 Блок-схема — графічне зображення алгоритму за допомогою стандартних блоків.
 
-| Блок | Форма | Входи | Виходи | Призначення |
-|------|-------|-------|--------|-------------|
-| Термінатор | Овал (еліпс) | 0 або 1 | 0 або 1 | Початок / Кінець |
-| Процес | Прямокутник | 1 | 1 | Обчислення, присвоєння |
-| Умова | Ромб | 1 | 2 | Розгалуження (Так/Ні) |
-| Введення/Виведення | Паралелограм | 1 | 1 | Операції вводу/виводу |
-| Підпрограма | Прямокутник з подвійними вертикальними лініями | 1 | 1 | Виклик підпрограми |
-| З'єднувач | Коло | 1 | 1 | Зв'язок між частинами блок-схеми |
+<table>
+<tr><th>Блок</th><th>Форма</th><th>Входи</th><th>Виходи</th><th>Призначення</th></tr>
+<tr>
+  <td><strong>Термінатор</strong></td>
+  <td><svg width="120" height="40"><ellipse cx="60" cy="20" rx="55" ry="16" fill="none" stroke="currentColor" stroke-width="2"/><text x="60" y="24" text-anchor="middle" font-size="12" fill="currentColor">Початок/Кінець</text></svg></td>
+  <td>0 або 1</td><td>0 або 1</td><td>Початок або кінець алгоритму</td>
+</tr>
+<tr>
+  <td><strong>Процес</strong></td>
+  <td><svg width="120" height="40"><rect x="5" y="4" width="110" height="32" fill="none" stroke="currentColor" stroke-width="2" rx="2"/><text x="60" y="24" text-anchor="middle" font-size="12" fill="currentColor">a = b + c</text></svg></td>
+  <td>1</td><td>1</td><td>Обчислення, присвоєння</td>
+</tr>
+<tr>
+  <td><strong>Умова</strong></td>
+  <td><svg width="120" height="50"><polygon points="60,2 115,25 60,48 5,25" fill="none" stroke="currentColor" stroke-width="2"/><text x="60" y="29" text-anchor="middle" font-size="12" fill="currentColor">a &gt; 0 ?</text></svg></td>
+  <td>1</td><td><strong>2</strong></td><td>Розгалуження (Так/Ні)</td>
+</tr>
+<tr>
+  <td><strong>Введення/<br>Виведення</strong></td>
+  <td><svg width="120" height="40"><polygon points="20,4 115,4 100,36 5,36" fill="none" stroke="currentColor" stroke-width="2"/><text x="60" y="24" text-anchor="middle" font-size="12" fill="currentColor">Ввести x</text></svg></td>
+  <td>1</td><td>1</td><td>Операції вводу/виводу</td>
+</tr>
+<tr>
+  <td><strong>Підпрограма</strong></td>
+  <td><svg width="120" height="40"><rect x="5" y="4" width="110" height="32" fill="none" stroke="currentColor" stroke-width="2" rx="2"/><line x1="17" y1="4" x2="17" y2="36" stroke="currentColor" stroke-width="2"/><line x1="103" y1="4" x2="103" y2="36" stroke="currentColor" stroke-width="2"/><text x="60" y="24" text-anchor="middle" font-size="12" fill="currentColor">func()</text></svg></td>
+  <td>1</td><td>1</td><td>Виклик підпрограми</td>
+</tr>
+<tr>
+  <td><strong>З'єднувач</strong></td>
+  <td><svg width="120" height="40"><circle cx="60" cy="20" r="16" fill="none" stroke="currentColor" stroke-width="2"/><text x="60" y="24" text-anchor="middle" font-size="12" fill="currentColor">A</text></svg></td>
+  <td>1</td><td>1</td><td>Зв'язок між частинами блок-схеми</td>
+</tr>
+</table>
 
 **Важливо:** Блок умови має **1 вхід** і **2 виходи** (Так/Ні).
 
