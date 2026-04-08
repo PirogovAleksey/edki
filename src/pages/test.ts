@@ -225,7 +225,7 @@ export async function startTest(topicId: string, mode: 'training' | 'exam'): Pro
     topicName: data.topic,
     mode,
     currentIndex: 0,
-    answers: new Array(data.questions.length).fill(null),
+    answers: new Array(selected.length).fill(null),
     showFeedback: false,
     timeLimit: (data.timeLimit || 60) * 60,
     timeRemaining: (data.timeLimit || 60) * 60,
