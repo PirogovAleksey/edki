@@ -19,8 +19,14 @@ async function setPageAsync(htmlPromise: Promise<string>): Promise<void> {
   cleanupTest();
   app.innerHTML = renderHeader() + '<main id="page-content"><div class="page"><div class="container"><p>Завантаження...</p></div></div></main>';
   bindHeaderEvents();
-  const html = await htmlPromise;
-  document.getElementById('page-content')!.innerHTML = html;
+  try {
+    const html = await htmlPromise;
+    const el = document.getElementById('page-content');
+    if (el) el.innerHTML = html;
+  } catch {
+    const el = document.getElementById('page-content');
+    if (el) el.innerHTML = '<div class="page"><div class="container"><p>Помилка завантаження. <a href="#/topics">Повернутися</a></p></div></div>';
+  }
 }
 
 // Routes

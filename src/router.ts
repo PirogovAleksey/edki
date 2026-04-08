@@ -32,7 +32,7 @@ function matchRoute(hash: string): void {
     if (match) {
       const params: RouteParams = {};
       route.keys.forEach((key, i) => {
-        params[key] = decodeURIComponent(match[i + 1]);
+        try { params[key] = decodeURIComponent(match[i + 1]); } catch { params[key] = match[i + 1]; }
       });
       route.handler(params);
       return;

@@ -18,7 +18,7 @@ interface TestState {
 let state: TestState | null = null;
 
 function cleanup(): void {
-  if (state?.timerId) {
+  if (state?.timerId !== null && state?.timerId !== undefined) {
     clearInterval(state.timerId);
     state.timerId = null;
   }
@@ -107,12 +107,13 @@ function bindTestEvents(): void {
   // Option click
   document.querySelectorAll('.option').forEach(btn => {
     btn.addEventListener('click', () => {
-      if (state!.mode === 'training' && state!.showFeedback) return;
-      const optionIndex = parseInt((btn as HTMLElement).dataset.option!);
-      state!.answers[state!.currentIndex] = optionIndex;
+      if (!state) return;
+      if (state.mode === 'training' && state.showFeedback) return;
+      const optionIndex = parseInt((btn as HTMLElement).dataset.option!, 10);
+      state.answers[state.currentIndex] = optionIndex;
 
-      if (state!.mode === 'training') {
-        state!.showFeedback = true;
+      if (state.mode === 'training') {
+        state.showFeedback = true;
       }
 
       render();
@@ -121,14 +122,16 @@ function bindTestEvents(): void {
 
   // Navigation
   document.getElementById('next-btn')?.addEventListener('click', () => {
-    state!.currentIndex++;
-    state!.showFeedback = false;
+    if (!state) return;
+    state.currentIndex++;
+    state.showFeedback = false;
     render();
   });
 
   document.getElementById('prev-btn')?.addEventListener('click', () => {
-    state!.currentIndex--;
-    state!.showFeedback = state!.mode === 'training' && state!.answers[state!.currentIndex] !== null;
+    if (!state) return;
+    state.currentIndex--;
+    state.showFeedback = state.mode === 'training' && state.answers[state.currentIndex] !== null;
     render();
   });
 
@@ -139,9 +142,10 @@ function bindTestEvents(): void {
   // Question map (exam mode)
   document.querySelectorAll('.question-map__item').forEach(btn => {
     btn.addEventListener('click', () => {
-      const idx = parseInt((btn as HTMLElement).dataset.goto!);
-      state!.currentIndex = idx;
-      state!.showFeedback = state!.mode === 'training' && state!.answers[idx] !== null;
+      if (!state) return;
+      const idx = parseInt((btn as HTMLElement).dataset.goto!, 10);
+      state.currentIndex = idx;
+      state.showFeedback = state.mode === 'training' && state.answers[idx] !== null;
       render();
     });
   });
@@ -149,7 +153,7 @@ function bindTestEvents(): void {
 
 function finishTest(): void {
   if (!state) return;
-  if (state.timerId) {
+  if (state.timerId !== null) {
     clearInterval(state.timerId);
     state.timerId = null;
   }
@@ -214,7 +218,16 @@ function shuffle<T>(array: T[]): T[] {
 export async function startTest(topicId: string, mode: 'training' | 'exam'): Promise<void> {
   cleanup();
 
-  const data: QuestionSet = await loadQuestions(topicId);
+  const validMode = mode === 'exam' ? 'exam' : 'training';
+
+  let data: QuestionSet;
+  try {
+    data = await loadQuestions(topicId);
+  } catch {
+    const app = getPageContent();
+    app.innerHTML = '<div class="page"><div class="container"><p>Помилка завантаження тесту. <a href="#/tests">Повернутися до тестів</a></p></div></div>';
+    return;
+  }
 
   const isFullExam = topicId === 'comprehensive' || topicId.startsWith('real-exam');
   const limit = isFullExam ? 100 : 10;
@@ -223,7 +236,7 @@ export async function startTest(topicId: string, mode: 'training' | 'exam'): Pro
   state = {
     questions: selected,
     topicName: data.topic,
-    mode,
+    mode: validMode,
     currentIndex: 0,
     answers: new Array(selected.length).fill(null),
     showFeedback: false,
